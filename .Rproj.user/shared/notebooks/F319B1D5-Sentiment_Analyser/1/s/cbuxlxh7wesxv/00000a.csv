@@ -1,0 +1,7 @@
+"0","news_data = mutate(news_data, news_data_new = sentiment_by(as.character(snippet))$ave_sentiment)"
+"2","Each time `sentiment_by` is run it has to do sentence boundary disambiguation when a
+raw `character` vector is passed to `text.var`. This may be costly of time and
+memory.  It is highly recommended that the user first runs the raw `character`
+vector through the `get_sentences` function."
+"0","news_data = news_data[,c(-1)]"
+"0",""

@@ -1,0 +1,3 @@
+"0","rm(list = setdiff(ls(), c('glmnet_classifier', 'conv_fun', 'prep_fun', 'tok_fun', 'vectorizer', 'tfidf')))"
+"0","save.image('image.RData')"
+"0","rm(list = ls())"

@@ -1,0 +1,2 @@
+"0","news_data <- read.csv(""Company_Data/American Express.csv"")"
+"0","head(news_data)"

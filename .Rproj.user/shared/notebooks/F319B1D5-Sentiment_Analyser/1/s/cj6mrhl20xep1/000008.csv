@@ -1,0 +1,2 @@
+"0","a <- head(news_data,2)"
+"0","a %>%mutate(new_col = sentiment(as.character(snippet))$sentiment)"

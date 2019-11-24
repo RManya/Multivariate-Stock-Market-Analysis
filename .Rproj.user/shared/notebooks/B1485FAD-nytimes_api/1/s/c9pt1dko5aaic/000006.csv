@@ -1,0 +1,4 @@
+"0","write.csv(df, 'microsoft.csv')"
+"0","drive_upload('microsoft.csv',path = 'Stock_Data_R', type='spreadsheet')"
+"2","
+"

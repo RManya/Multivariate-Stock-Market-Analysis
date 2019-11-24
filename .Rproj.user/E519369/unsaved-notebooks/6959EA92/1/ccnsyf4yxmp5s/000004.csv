@@ -1,0 +1,6 @@
+"0","set.seed(2340)"
+"0","trainIndex <- createDataPartition(tweets_classified$sentiment, p = 0.8, "
+"0","                                  list = FALSE, "
+"0","                                  times = 1)"
+"0","tweets_train <- tweets_classified[trainIndex, ]"
+"0","tweets_test <- tweets_classified[-trainIndex, ]"

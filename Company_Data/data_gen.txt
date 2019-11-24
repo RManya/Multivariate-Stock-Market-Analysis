@@ -1,0 +1,301 @@
+Currently getting the data for 3M
+     Currently getting the data for the year 2008
+Currently getting the data for 3M
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for 3M
+Currently getting the data for American Express
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for American Express
+Currently getting the data for Apple
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Apple
+Currently getting the data for Boeing
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Boeing
+
+Currently getting the data for Caterpillar Inc.
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Caterpillar Inc.
+Currently getting the data for Chevron Corporation
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Chevron Corporation
+Currently getting the data for Cisco
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Cisco
+Currently getting the data for Coca-Cola
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+Currently getting the data for Coca-Cola
+     Currently getting the data for the year 2008
+Currently getting the data for Coca-Cola
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Coca-Cola
+Currently getting the data for Dow
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+Currently getting the data for Dow
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Dow
+Currently getting the data for ExxonMobil
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for ExxonMobil
+Currently getting the data for Goldman Sachs
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+Currently getting the data for Goldman Sachs
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+Currently getting the data for Goldman Sachs
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for Goldman Sachs
+Currently getting the data for The Home Depot
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+     Currently getting the data for the year 2016
+     Currently getting the data for the year 2017
+Succesfully got the data for The Home Depot
+Currently getting the data for IBM
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+Currently getting the data for IBM
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for IBM
+Currently getting the data for Intel
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+Currently getting the data for IBM
+     Currently getting the data for the year 2008
+Currently getting the data for Intel
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+Currently getting the data for Intel
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for Intel
+Currently getting the data for Johnson & Johnson
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+Currently getting the data for Johnson & Johnson
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for Johnson & Johnson
+Currently getting the data for JPMorgan Chase
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for JPMorgan Chase
+Currently getting the data for McDonald's
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Currently getting the data for McDonald's
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+Currently getting the data for McDonald's
+     Currently getting the data for the year 2008
+Currently getting the data for McDonald's
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for McDonald's
+Currently getting the data for Merck & co
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for Merck & co
+Currently getting the data for Microsoft
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+Currently getting the data for Microsoft
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for Microsoft
+Currently getting the data for Nike
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012
+     Currently getting the data for the year 2013
+     Currently getting the data for the year 2014
+     Currently getting the data for the year 2015
+Succesfully got the data for Nike
+Currently getting the data for Pfizer
+     Currently getting the data for the year 2008
+     Currently getting the data for the year 2009
+     Currently getting the data for the year 2010
+     Currently getting the data for the year 2011
+     Currently getting the data for the year 2012

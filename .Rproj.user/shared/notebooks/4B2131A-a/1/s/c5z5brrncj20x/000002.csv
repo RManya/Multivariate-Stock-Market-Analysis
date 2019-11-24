@@ -1,0 +1,41 @@
+"0","library(xlsx)"
+"0","library(""openxlsx"") "
+"2","
+Attaching package: ‘openxlsx’
+
+"
+"2","The following objects are masked from ‘package:xlsx’:
+
+    createWorkbook, loadWorkbook, read.xlsx, saveWorkbook, write.xlsx
+
+"
+"0","library(rsample) "
+"2","Loading required package: tidyr
+"
+"0","library(dplyr) "
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(rpart) "
+"0","library(rpart.plot) "
+"0","library(ipred) "
+"0","library(caret)"
+"2","Loading required package: lattice
+"
+"2","Loading required package: ggplot2
+"
+"0","library(dummies)"
+"2","dummies-1.5.6 provided by Decision Patterns
+
+"

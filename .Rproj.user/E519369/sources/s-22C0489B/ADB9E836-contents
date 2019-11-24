@@ -1,0 +1,126 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+library('googledrive')
+api = "Nql4mIbzy44BETXG70DGesoOoXlnXeKH"
+```
+
+
+
+```{r}
+if (!require("jsonlite")) install.packages("jsonlite")
+library(jsonlite)
+#################################################################################
+####            function - search news article with API                      ####
+nytime = function (keyword,year) {
+  searchQ = URLencode(keyword)
+  url = paste('http://api.nytimes.com/svc/search/v2/articlesearch.json?q=',searchQ,
+              '&begin_date=',year,'0101&end_date=',year,'1231&api-key=',api,sep="")
+  #get the total number of search results
+  initialsearch = fromJSON(url,flatten = T)
+  maxPages = round((initialsearch$response$meta$hits / 10)-1)
+  
+  #try with the max page limit at 10
+  maxPages = ifelse(maxPages >= 10, 10, maxPages)
+  #creat a empty data frame
+  df = data.frame(id=as.numeric(),created_time=character(),snippet=character(),
+                  headline=character(),news_desk = character(),company_name = character())
+  
+  #save search results into data frame
+  r <- NULL
+  attempt <- 1
+  while( is.null(r) && attempt <= 3 ) {
+    attempt <- attempt + 1
+    try(
+      for(i in 0:maxPages){
+        #get the search results of each page
+        nytSearch = fromJSON(paste0(url, "&page=", i), flatten = T) 
+        temp = data.frame(id=1:nrow(nytSearch$response$docs),
+                          created_time = nytSearch$response$docs$pub_date,
+                          snippet = nytSearch$response$docs$snippet,
+                          headline = nytSearch$response$docs$headline.main,
+                          news_desk = nytSearch$response$docs$news_desk,
+                          company_name = keyword)
+        df=rbind(df,temp)
+        Sys.sleep(5) #sleep for 5 second
+        }
+    )
+  } 
+  return(df)
+}
+```
+
+```{r}
+company_list = c('American Express','Apple','Boeing','Caterpillar Inc.','Chevron Corporation','Cisco','Coca-Cola','Dow','ExxonMobil','Goldman Sachs', 'The Home Depot','IBM','Intel','Johnson & Johnson','JPMorgan Chase',"McDonald's",'Merck & co','Microsoft','Nike','Pfizer','Procter & Gamble',' The Travelers Companies','United Health Group','United Technologies','Verizon','Visa Inc.','Walmart','Walgreens Boots Alliance','The Walt Disney Company')
+years = c(2008,2009,2010,2011,2012,2013,2014,2015,2016,2017)
+```
+
+
+
+
+
+
+
+```{r}
+companies_df =  data.frame(id=as.numeric(),created_time=character(),snippet=character(),
+                  headline=character(),news_desk = character(),company_name = character())
+for (company in company_list){
+  cat(paste0("Currently getting the data for ",company,"\n"),file = "Company_Data/data_gen.txt",append = TRUE)
+  print(paste0("Currently getting the data for ",company))
+  company_df =  data.frame(id=as.numeric(),created_time=character(),snippet=character(),
+                  headline=character(),news_desk = character(),company_name = character())
+  for(year in years){
+    print(paste0("     ",year))
+    cat(paste0("     Currently getting the data for the year ",year,"\n"),file = "Company_Data/data_gen.txt",append = TRUE)
+    df = nytime(company,year)
+    company_df <- rbind(company_df,df)
+    for (i in 1:10){
+      print("")
+      Sys.sleep(1)
+      }
+  }
+  file1 = paste0("Company_Data/",company,".csv")
+  print(file1)
+  write.csv(company_df,file = file1)
+  companies_df <- rbind(companies_df,company_df)
+  cat(paste0("Succesfully got the data for ",company,"\n"),file = "Company_Data/data_gen.txt",append = TRUE)
+  for (i in 1:20){
+    print("")
+    Sys.sleep(1)
+    }
+}
+write.csv(companies_df,file = "Company_Data/Final_Dataframe.csv")
+
+```
+
+
+
+```{r}
+dt1 = nytime('Microsoft',2018)
+```
+
+```{r}
+df1<- dt1
+df1$created_time <- as.Date(df1$created_time, "%Y-%m-%d")
+df1<-df1[order(df1$created_time),]
+df1
+```
+
+
+
+```{r}
+df$created_time <- as.Date(df$created_time, "%Y-%m-%d")
+df<-df[order(df$created_time),]
+df
+```
+
+```{r}
+drive_upload('microsoft.csv',path = 'Stock_Data_R', type='spreadsheet')
+```

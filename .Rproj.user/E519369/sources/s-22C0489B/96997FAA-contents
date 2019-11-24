@@ -1,0 +1,492 @@
+---
+title: "Assignment 4"
+output: pdf_document
+author: "Abhijit Krishna Menon and Manya Raman"
+header-includes:
+ \usepackage{booktabs}
+ \usepackage{longtable}
+ \usepackage{array}
+ \usepackage{multirow}
+ \usepackage[table]{xcolor}
+ \usepackage{wrapfig}
+ \usepackage{float}
+ \floatplacement{figure}{H}
+---
+
+## Code to stop code overflow.
+```{r wrap-hook}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+
+
+```{r setup, include=FALSE}
+
+library(readxl) 
+library(car) 
+library(gvlma) 
+library(MASS) 
+library(dplyr)
+library(leaps) 
+library(bootstrap)
+library(dplyr)
+library(class)
+library(e1071)
+library(caret)
+
+```
+
+# Problem 1 (Personal Loan Acceptance, k-NN) [30 points]
+Universal Bank is a relatively young bank growing rapidly in terms of overall customer acquisition. The majority of these customers are liability customers (depositors) with varying sizes of relationship with the bank. The customer base of asset customers (borrowers) is quite small, and the bank is interested in expanding this base rapidly to bring in more loan business. In particular, it wants to explore ways of converting its liability customers to personal loan customers (while retaining them as depositors).
+A campaign that the bank ran last year for liability customers showed a healthy conversion rate of over 9% success. This has encouraged the retail marketing department to devise smarter campaigns with better target marketing. The goal of our analysis is to model the previous campaign's customer behavior to analyze what combination of factors make a customer more likely to accept a personal loan. This will serve as the basis for the design of a new campaign.
+The file UniversalBank.xlsx contains data on 5000 customers. The data include customer demographic information (age, income, etc.), the customer's relationship with the bank (mortgage, securities account, etc.), and the customer response to the last personal loan campaign (Personal Loan). Among these 5000 customers, only 480(= 9.6%) accepted the personal loan that was offered to them in the earlier campaign.
+Partition the data into training (60%) and validation (40%) sets.
+
+
+```{r load data set}
+Universal_bank_df <- read_xlsx("UniversalBank.xlsx",sheet = 2)
+head(Universal_bank_df)
+```
+## a. Consider the following customer: Age=40, Experience=10, Income=84, Family=2, CCAvg=2, Education2=1, Education3=0, Mortgage=O, Securities Account=O, CD Account=O, Online=1 and Credit.card = 1. Perform a k-NN classification with all predictors except ID and ZIP code using k = 1. Remember to transform categorical predictors with more than two categories into dummy variables first. Specify the success class as 1 (loan acceptance), and use the default cutoff value of 0.5. How would this customer be classified?
+
+```{r pationing the data}
+total_rows = nrow(Universal_bank_df)
+train_rows = floor(0.6 * nrow(Universal_bank_df))
+train_bank <- Universal_bank_df[1:train_rows,]
+test_bank <- Universal_bank_df[(train_rows+1):total_rows,]
+default_train <- train_bank$`Personal Loan`
+default_test <- test_bank$`Personal Loan`
+```
+
+
+```{r train model}
+train_mod <- model.matrix(~Age+Experience+Income+Family+CCAvg+factor(Education)- 
+                            1+Mortgage+ `Securities Account`+`CD Account`+Online+CreditCard,data=train_bank)
+test_mod<-model.matrix(~Age+Experience+Income+Family+CCAvg+factor(Education)- 
+                         1+Mortgage+`Securities Account`+`CD Account`
+                       +Online+CreditCard,data=test_bank)
+```
+
+```{r make_pred}
+knn(train_mod,c(40,10,84,2,2,0,1,0,0,0,0,1,1),default_train,k=1)
+```
+
+Thus the new customer belongs to class 0 based on the given inputs. 
+
+
+
+## b. What is a choice of k that balances between overfitting and ignoring the predictor information?
+
+Going up till 9 and using only odd numbers because it is more efficient for k to be an odd number in the case of a rie 
+```{r Picking k value}
+k_1 <- knn(train_mod,test_mod,default_train,k=1)
+k_3 <- knn(train_mod,test_mod,default_train,k=3)
+k_5 <- knn(train_mod,test_mod,default_train,k=5)
+k_7 <- knn(train_mod,test_mod,default_train,k=7)
+k_9 <- knn(train_mod,test_mod,default_train,k=9)
+table(k_1 ,default_test)
+table(k_3 ,default_test) 
+table(k_5 ,default_test) 
+table(k_7 ,default_test) 
+table(k_9 ,default_test)
+```
+
+Based on the above results we can see that when k=7 we get the highest number of right predictions(True Positives and True Negetives) which is a good sign. Thus, k = 7 seems to be the best choice. 
+
+
+## c. Show the classification matrix for the validation data that results from using the best k.
+```{r k_7_matrix}
+table(k_7 ,default_test) 
+```
+
+
+
+## d. Consider the following customer: Age=40, Experience=10, Income=84, Family=2, CCAvg=2, Education 1=0, Education 2=1, Education 3=0, Mortgage=0, Securities Account=0, CD Account=0, Online=1 and Credit Card=1. Classify the customer using the best k.
+```{r predictiond}
+knn(train_mod,c(40,10,84,2,2,0,1,0,0,0,0,1,1),default_train,k=7)
+```
+The customer still belongs to Class 0 even on using k =7.
+
+
+
+## e. Repartition the data, this time into training, validation, and test sets (50% : 30% : 20%). Apply the k-NN method with the k chosen above. Compare the classification matrix of the test set with that of the training and validation sets. Comment on the differences and their reason.
+
+```{r re-partion data.}
+total_rows = nrow(Universal_bank_df)
+train_rows = floor(0.5 * nrow(Universal_bank_df))
+valid_rows = floor(0.8 * nrow(Universal_bank_df))
+train_bank <- Universal_bank_df[1:train_rows,]
+valid_bank <- Universal_bank_df[(train_rows+1):valid_rows,]
+test_bank <- Universal_bank_df[(valid_rows+1):total_rows,]
+default_train <- train_bank$`Personal Loan`
+default_valid <- valid_bank$`Personal Loan`
+default_test <- test_bank$`Personal Loan`
+```
+
+```{r re train models}
+train_mod <- model.matrix(~Age+Experience+Income+Family+CCAvg
+                          +factor(Education)- 1+Mortgage
+                          + `Securities Account`+`CD Account`
+                          +Online+CreditCard,data=train_bank)
+
+
+valid_mod <- model.matrix(~Age+Experience+Income+Family+CCAvg
+                          +factor(Education)- 1+Mortgage
+                          + `Securities Account`+`CD Account`
+                          +Online+CreditCard,data=valid_bank)
+
+test_mod<-model.matrix(~Age+Experience+Income+Family+CCAvg+factor(Education)
+                       - 1+Mortgage+`Securities Account`
+                       +`CD Account`+Online+CreditCard,data=test_bank)
+```
+
+```{r predictions new}
+pred_valid <- knn(train_mod,valid_mod,default_train,k=7)
+pred_test <- knn(train_mod,test_mod,default_train,k=7)
+pred_train <- knn(train_mod,train_mod,default_train,k=7)
+
+table(pred_train,default_train)
+table(pred_valid,default_valid)
+table(pred_test,default_test)
+```
+The training data obviously has the best performance because the model has been trained on the same values. Thus, this is not surprising. 
+We also notice consistantly that the Type 1 errors are quite high. This might be because we do not have enough observations on the class 1 type. Thus to fix this we should over sample for the class 1 to make the predictions even out. 
+In the test  set the Type 1 error ratio is higher than in the validation/training. 
+
+
+# Problem 2 (Predicting Housing Median Prices k-NN)
+The file BostonHousing.xlsx contains information on over 500 census tracts in Boston, where for each tract 14 variables are recorded. The last column (CAT.MEDV) was derived from MEDV, such that it obtains the value 1 if MEDV > 30 and 0 otherwise. Consider the goal of predicting the median value (MEDV) of a tract, given the information in the first 13 columns. Partition the data into training (60%) and validation (40%) sets.
+
+```{r loading dataset 2}
+Boston_Housing_df <- read_xlsx("BostonHousing.xlsx",sheet = 2)
+head(Boston_Housing_df)
+norm_Boston_Housing_df <- as.data.frame(scale(Boston_Housing_df[,-c(13,14)]))
+head(norm_Boston_Housing_df)
+```
+
+
+## a. Perform a k-NN prediction with all 13 predictors (ignore the CAT.MEDV column), trying values of k from 1 to 5. Make sure to normalize the data (click "normalize input data"). What is the best k chosen? What does it mean?
+
+```{r Partioning dataset2}
+total_rows = nrow(norm_Boston_Housing_df)
+train_rows = floor(0.6 * nrow(norm_Boston_Housing_df))
+train_housing <- norm_Boston_Housing_df[1:train_rows,]
+test_housing <- norm_Boston_Housing_df[(train_rows+1):total_rows,]
+default_train <- Boston_Housing_df$`CAT. MEDV`[1:train_rows]
+default_test <- Boston_Housing_df$`CAT. MEDV`[(train_rows+1):total_rows]
+```
+
+```{r testing k values}
+k_1 <- knn(train_housing,test_housing,default_train,k=1)
+k_2 <- knn(train_housing,test_housing,default_train,k=2)
+k_3 <- knn(train_housing,test_housing,default_train,k=3)
+k_4 <- knn(train_housing,test_housing,default_train,k=4)
+k_5 <- knn(train_housing,test_housing,default_train,k=5)
+table(k_1 ,default_test)
+table(k_2 ,default_test) 
+table(k_3 ,default_test) 
+table(k_4 ,default_test) 
+table(k_5 ,default_test)
+
+```
+k = 5 gives us the correct Right:Wrong ratio. This means that a new input can be classified by comparing it's 5 closest neighbors and looking at what class they belong to. Depending on the highest  class around it, we can classify our input.
+
+## b. Predict the MEDV for a tract with the following information, using the best k:
+
+```{r predict_val}
+to_pred = c(0.2, 0, 7, 0, 0.538, 6, 62, 4.7, 4, 307, 21, 10)
+to_pred_scaled <- vector(mode = "list", length = 12)
+bos_hos_df = as.matrix(Boston_Housing_df)
+for (i in c(1:12)){   
+  # Need to scale input value with the same values as the training data was scaled. 
+  to_pred_scaled[i] <- (to_pred[i]-mean(bos_hos_df[,i]))/sd(bos_hos_df[,i])
+}
+knn(train_housing,to_pred_scaled,default_train,k=5,prob = TRUE)
+```
+Thus the new data is classified as class 0 and this means that the MEDV is less than 30. 
+
+## c. Why is the error of the training data zero?
+The error of teh training data tends to be 0 mostly when k=1. This happends because when the value of k =1, the closest point to it by eucleadian distance is itself. This means that while training there is no doubt in classification as raised by surrounding points. This leads to all input points being predicted correctly. However, this logic would not apply to the training data. Because, in the training data the comparisons are essential to making right predictions. 
+
+
+
+## d. Why is the validation data error overly optimistic compared to the error rate when applying this k-NN predictor to new data?
+
+The error rate from the validation data set is overly optimistic because even though the data was not really used for training, it comes from the same dataset. This means that there might be a few intricacies that are present from the same sample that might have carried forward to the validation set as well. 
+However, this is not the case with the new data. The new data is completely random and could have captured information that was missed by training the data on the old dataset. Thus it is important to validate the data on an external test set, apart from just the initial data that was given to the programmer. 
+
+## e. If the purpose is to predict MEDV for several thousands of new tracts, what would be the disadvantage of using k-NN prediction? List the operations that the algorithm goes through in order to produce each prediction.
+
+K-NN is a good algorithm when it comes to the classification of a few cases/inputs. However when it comes to larger amounts of inputs, it is simply inneficient to employ a k-nn algorithm. The steps it will have to take to perform all the classifications are as below:
+
+    * Normalize the input using the mean and standard deviations as used while training the data. 
+    
+    * Then we need to place this data point on a map along with the other data points from 
+    the training data. 
+    
+    * We then calculate the distance of our new point from the otehr points in the training data. 
+    
+    * We sort the distances and pick the bottom k nearest neighbors.
+    
+    * We then classisfy our point based on the comparisons of the k points. 
+    
+Having to go through all these steps to make a classification is simply unreasonable computationally very taxing, this is why the knn algorithnm does not make sense to use when the input size is huge, 
+
+
+# Problem 3
+
+Automobile Accidents. The file Accidents.xls contains information on 42,183 actual
+automobile accidents in 2001 in the United States that involved one of three levels of injury: NO
+INJURY, INJURY, or FATALITY. For each accident, additional information is recorded, such as
+day of week, weather conditions, and road type. A firm might be interested in developing a
+system for quickly classifying the severity of an accident based on initial reports and associated
+data in the system (some of which rely on GPS assisted reporting). Our goal here is to predict
+whether an accident just reported will involve an injury (MAX SEV IR = 1 or 2) or will not (MAX
+SEV IR = 0). For this purpose, create a dummy variable called INJURY that takes the value
+“yes” if MAX SEV IR = 1 or 2, and otherwise “no.”
+
+
+
+```{r}
+Accidents_data<- read_xlsx("Accidents.xlsx",sheet = "Data")
+
+Accidents_data["Injury"] <- ifelse(Accidents_data$MAX_SEV_IR == 0, "NO", "YES")
+
+prob_yes =  sum(Accidents_data$Injury == 'YES')/nrow(Accidents_data)
+print(prob_yes)
+
+```
+## a. Using the information in this dataset, if an accident has just been reported and no further information is available, what should the prediction be? (INJURY =Yes or No?) Why?
+
+$\text{Probability of Injury in the accident} = \frac{\text{Number of injuries in accident}}{{\text{Total number of records}}}$
+
+$=  \text{Probability of Injury in the accident} = \frac{21462}{42183} = 0.508 = 50.8\% \approx 51\%$
+
+The probability of getting an injury  is higher than that  of  not. Therefore, the prediction will be yes. 
+
+## b. Select the first 12 records in the dataset and look only at the response (INJURY) and the two predictors WEATHER R and TRAF CON R.
+```{r}
+
+Accidents_data_12<- Accidents_data [1:12, c("Injury","WEATHER_R", "TRAF_CON_R")]
+Accidents_data_12
+```
+
+## i. Create a pivot table that examines INJURY as a function of the two predictors
+for these 12 records. Use all three variables in the pivot table as rows/columns,
+and use counts for the cells.
+
+```{r PivotTable, echo=FALSE, fig.cap="Pivot Table", out.width = '100%'}
+knitr::include_graphics("PIVOT_TABLE.jpeg")
+```
+## ii.Compute the exact Bayes conditional probabilities of an injury (INJURY =Yes) given the six possible combinations of the predictors.
+
+### 1) To find P(Injury=yes|WEATHER_R = 1, TRAF_CON_R =0):
+
+$\text{Numerator} =  (Injury = yes | WEATHERR\ = 1, TRAFCONR = 0) *  \text{(proportion of injuries in all cases)}$
+
+$\text{Numerator} =  \frac{2}{3} * \frac{3}{12} = \frac{1}{6}$
+
+$\text{Denominator} =  (Injury = yes and no | WEATHERR\ = 1, TRAFCONR = 0) \text{in all cases}$
+
+#$\text{Denominator} = \frac{3}{12} = \frac{1}{4}$
+
+$P(Injury = yes | WeatherR = 1, TRAF_CON_R = 0) = \frac{\frac{1}{6}}{\frac{1}{4}} = \frac{2}{3}= 0.667$
+
+
+### 2) To find P(Injury=yes|WEATHER_R = 1, TRAF_CON_R =1):
+
+$\text{Numerator} =  (Injury = yes | WEATHERR\ = 1, TRAFCONR = 1) *  \text{(proportion of injuries in all cases)}$
+
+$\text{Numerator} =  \frac{0}{3} * \frac{3}{12} = 0$
+
+$\text{Denominator} =  (Injury = yes and no | WEATHERR\ = 1, TRAFCONR = 1) \text{in all cases}$
+
+#$\text{Denominator} = \frac{1}{12}$
+
+$P(Injury = yes | WeatherR = 1, TRAF_CON_R = 1) = \frac{0}{\frac{1}{12}} = 0$
+
+
+### 3) To find P(Injury=yes|WEATHER_R = 1, TRAF_CON_R =2):
+
+$\text{Numerator} =  (Injury = yes | WEATHERR\ = 1, TRAFCONR = 2) *  \text{(proportion of injuries in all cases)}$
+
+$\text{Numerator} =  \frac{0}{3} * \frac{3}{12} = 0$
+
+$\text{Denominator} =  (Injury = yes and no | WEATHERR\ = 1, TRAFCONR = 2) \text{in all cases}$
+
+#$\text{Denominator} = \frac{1}{12}$
+
+$P(Injury = yes | WeatherR = 1, TRAF_CON_R = 2) = \frac{0}{\frac{1}{12}} = 0$
+
+
+### 4)  To find P(Injury=yes|WEATHER_R = 2, TRAF_CON_R =0):
+
+$\text{Numerator} =  (Injury = yes | WEATHERR\ = 2, TRAFCONR = 0) *  \text{(proportion of injuries in all cases)}$
+
+$\text{Numerator} =  \frac{1}{3} * \frac{3}{12} = \frac{1}{12}$
+
+$\text{Denominator} =  (Injury = yes and no | WEATHERR\ = 2, TRAFCONR = 0) \text{in all cases}$
+
+#$\text{Denominator} = \frac{6}{12} = \frac{1}{2}$
+
+$P(Injury = yes | WeatherR = 2, TRAF_CON_R = 0) = \frac{\frac{1}{12}}{\frac{1}{2}} = \frac{1}{6}= 0.167$
+
+### 5) To find P(Injury=yes|WEATHER_R = 2, TRAF_CON_R =1):
+
+$\text{Numerator} =  (Injury = yes | WEATHERR\ = 2, TRAFCONR = 1) *  \text{(proportion of injuries in all cases)}$
+
+$\text{Numerator} =  \frac{0}{3} * \frac{3}{12} = 0$
+
+$\text{Denominator} =  (Injury = yes and no | WEATHERR\ = 2, TRAFCONR = 1) \text{in all cases}$
+
+#$\text{Denominator} = \frac{1}{12}$
+
+$P(Injury = yes | WeatherR = 2, TRAF_CON_R = 1) = \frac{0}{\frac{1}{12}} = 0$
+
+### 6)  To find P(Injury=yes|WEATHER_R = 2, TRAF_CON_R =2):
+
+Since there is no such observation with the above conditions the conditional probability here is undefined. 
+
+
+## iii. Classify the 12 accidents using these probabilities and a cutoff of 0.5.
+
+
+
+
+```{r success_prob, echo=FALSE, fig.cap="Success Probablity cut off = 0.5", out.width = '100%'}
+knitr::include_graphics("success_prob_cutoff.jpeg")
+```
+
+
+
+## iv. Compute manually the naive Bayes conditional probability of an injury given WEATHER R = 1 and TRAF CON R = 1.
+
+To find P(Injury=no| WEATHER_R = 1, TRAF_CON_R =1):
+
+$\text{Probability of injury involved in accidents} = \text{(proportion of WEATHERR =1 when Injury = yes)} * \text{(proportion of TRAFCONR =1 when Injury = yes)} * \text{(propotion of Injury = yes in all cases)}$
+
+
+$\frac{2}{3} * \frac{0}{3} * \frac{3}{12}  = 0$
+
+$\text{Probability of no injury involved in accidents} = \text{(proportion of WEATHERR =1 when Injury = no)} * \text{((proportion of TRAFCONR =1 when Injury =no)} * \text{(propotion of Injury =no in all cases)}$
+
+
+$numerator = \frac{3}{9} * \frac{2}{9} * \frac{9}{12}  = \frac{1}{18}$
+
+$denominator = \frac{3}{9} * \frac{2}{9} * \frac{9}{12} + \frac{2}{3} * 0 * \frac{3}{12}  = \frac{1}{18} + 0$
+
+$= \frac{\frac{1}{18}}{\frac{1}{18}} = 1$
+
+Therefore, probability of no injury given w=1 and t=1 is 1. 
+
+### P(Injury = yes | WEATHER_R = 1, TRAF_CON_R =1)
+
+$\frac{\text{probability of injury involved in the accidents}}{\text{probability of injury involved in the accidents + probability of no injury involved in the accidents}}$
+
+
+$\text{Numerator} = \frac{2}{3} * 0 * \frac{3}{12} = 0$
+
+Therefore, probability of injury given w=1 and t=1 is 0. 
+
+
+### v.Run a naive Bayes classifier on the 12 records and 2 predictors. Obtain probabilities and classifications for all 12 records. Compare this to the exact Bayes classification. Are the resulting classifications equivalent? Is the ranking (= ordering) of observations equivalent?
+
+
+```{r nb_acc}
+#Accidents_data_12$Injury<-factor(Accidents_data_12$Injury)
+nb_model_12 <- naiveBayes(as.factor(Injury) ~ WEATHER_R + TRAF_CON_R, data = Accidents_data_12)
+nb_model_12
+```
+
+```{r nb_acc-pred}
+nb_test_predict <- predict(nb_model_12,Accidents_data_12[,-1])
+table(pred=nb_test_predict,true=Accidents_data_12$Injury)
+mean(nb_test_predict==Accidents_data_12$Injury) #fraction of correct predictions.
+```
+
+
+The classifications for both the Exact Bayes and Naive bayes are different. On ranking the probabilities the ordering is the same,
+
+
+
+## c. Let us now return to the entire dataset. Partition the data into training/validation sets.
+
+Total records : 42183
+Training : 60%
+Validation : 40%
+
+i. Assuming that no information or initial reports about the accident itself are available at the time of prediction (only location characteristics, weather
+conditions, etc.), which predictors can we include in the analysis? (Usethe Data Codes sheet.)
+```{r nb filtering}
+required_variables = c("Injury",'HOUR_I_R', 'ALIGN_I', 'WRK_ZONE', 
+                       "WKDY_I_R", "INT_HWY", "LGTCON_I_R", "PROFIL_I_R",
+                       "SPD_LIM", "SUR_COND", "TRAF_CON_R", "TRAF_WAY", "WEATHER_R")
+Accidents_data_filtered = Accidents_data[,required_variables]
+```
+
+ Since only the weather, conditions and location charecterestics are available,the relevant predictor variables are:
+HOUR_I_R, ALIGN_I, WRK_ZONE, WKDY_I_R, INT_HWY, LGTCON_I_R, PROFIL_I_R, SPD_LIM, SUR_CON, TRAF_CON_R, TRAF_WAY and WEATHER_R.
+
+
+
+ii. Run a naive Bayes classifier on the complete training set with the relevant predictors (and INJURY as the response). Note that all predictors are categorical. Show the classification matrix.
+
+```{r splitting data3}
+total_rows = nrow(Accidents_data_filtered)
+train_rows = floor(0.6 * nrow(Accidents_data_filtered))
+Accidents_training_data <- Accidents_data_filtered[1:train_rows,]
+Accidents_test_data <- Accidents_data_filtered[(train_rows+1):total_rows,]
+```
+
+```{r nb modelling}
+naive_model<-naiveBayes(as.factor(Injury)~.,data=Accidents_training_data)
+naive_model
+pred.train<-predict(naive_model,Accidents_training_data[,-1])
+```
+
+```{r confmat1}
+confusionMatrix(as.factor(pred.train),as.factor(Accidents_training_data$Injury))
+```
+
+iii. What is the overall error for the validation set?
+
+```{r confmat}
+pred.test<-predict(naive_model,Accidents_test_data[,-1])
+cm <- confusionMatrix(as.factor(pred.test),as.factor(Accidents_test_data$Injury))
+cm
+```
+
+
+```{r errorate1}
+error_rate_valid = 1 - 0.5265 
+print(error_rate_valid)
+```
+
+iv. What is the percent improvement relative to the naive rule (using the validation set)?
+```{r errorate}
+error_rate_train = 1 - 0.529   
+print(error_rate_train)
+```
+
+The error rates for both the training and teh validation set are fairly simillar. The improvement in the error rate is 0.24%.,
+
+
+v. Examine the conditional probabilities output. Why do we get a probability of zero for P(INJURY =No | SPD_LIM = 5)?
+
+```{r test}
+Accidents_data_speed_5 <- Accidents_data%>%filter(SPD_LIM==5 & Injury=="NO")
+Accidents_data_no <- Accidents_data%>%filter(Injury=="NO")
+(nrow(Accidents_data_speed_5)/nrow(Accidents_data_no))
+```
+
+The probability is not 0 but is incredibly close to 0 thus we round it off. 

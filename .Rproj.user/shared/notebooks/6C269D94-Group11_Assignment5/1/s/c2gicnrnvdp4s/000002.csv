@@ -1,0 +1,2 @@
+"0","Toyota_data_new$Fuel_Type <- factor(Toyota_data_new$Fuel_Type)"
+"0","Toyota_data_new$Color <- factor(Toyota_data_new$Color)"

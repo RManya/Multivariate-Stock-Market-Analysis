@@ -1,0 +1,45 @@
+---
+title: "Sentiment Analyser"
+output: html_notebook
+---
+
+```{r}
+library(sentimentr)
+```
+
+```{r}
+mytext <- c(
+  'do you like it?  But I hate really bad dogs',
+  'I am the best friend.',
+  "Do you really like it?  I'm not a fan",
+  "It's like a tree.",
+  "Microsoft is an amazing girl. It is doing really well and has made us all proud.",
+  "Facebook is such a scam. It should be wiped out from the face of this earth.",
+  "The Federal Reserve granted the company’s request to change its status, giving it access to low-cost financing."
+)
+
+typeof(mytext)
+## works on a character vector but not the preferred method avoiding the 
+## repeated cost of doing sentence boundary disambiguation every time 
+## `sentiment` is run.  For small batches the loss is minimal.
+## Not run: 
+sentiment_by(mytext)
+```
+
+```{r load data}
+news_data <- read.csv("Company_Data/American Express.csv")
+head(news_data)
+```
+
+```{r get_sentiment}
+news_data = mutate(news_data, news_data_new = sentiment_by(as.character(snippet))$ave_sentiment)
+news_data = news_data[,c(-1)]
+```
+
+```{r}
+news_data
+```
+
+```{r}
+typeof(news_data$snippet)g
+```

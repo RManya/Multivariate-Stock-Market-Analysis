@@ -1,0 +1,8 @@
+"0","library(twitteR)"
+"0","library(ROAuth)"
+"0","library(tidyverse)"
+"0","library(purrrlyr)"
+"0","library(text2vec)"
+"0","library(caret)"
+"0","library(glmnet)"
+"0","library(ggrepel)"

@@ -1,0 +1,2 @@
+"0","Toyota_data<-read.xlsx(""ToyotaCorolla.xlsx"",sheet = ""data"")"
+"0","Toyota_data[,-1]"

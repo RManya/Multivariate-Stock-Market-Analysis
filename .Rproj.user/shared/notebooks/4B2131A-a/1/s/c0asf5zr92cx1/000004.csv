@@ -1,0 +1,4 @@
+"0","Toyota_data_new = Toyota_data_new[,-7]"
+"0","Toyota_data_new = cbind(Toyota_data_new,dummy(Toyota_data_new$Color, sep = ""_""))"
+"0","Toyota_data_new = Toyota_data_new[,-9]"
+"0","Toyota_data_new"

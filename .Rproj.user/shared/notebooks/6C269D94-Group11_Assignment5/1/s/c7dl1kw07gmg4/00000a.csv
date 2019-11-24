@@ -1,0 +1,2 @@
+"0","Toyota_data_dummy <- dummy.data.frame(Toyota_data_new, names = c(""Fuel_Type"",""Color"") , sep = ""."")"
+"0","Toyota_data_dummy"
