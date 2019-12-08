@@ -1,0 +1,185 @@
+---
+title: "R Notebook"
+output: pdf_output
+---
+
+
+```{r loading_data}
+stock_df <- read.csv("Final_data_with_reddit.csv")
+stock_df <- stock_df[,3:11]
+head(stock_df)
+```
+
+
+```{r}
+x <- stock_df$sentiment_score
+h<-hist(x, breaks=2, col="red", xlab="Sentiment", 
+   main="Histogram with Normal Curve") 
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+```
+
+```{r}
+stock_df <- read.csv("Final_data_na_filtered")
+stock_df <- stock_df[,3:11]
+head(stock_df)
+```
+
+
+```{r}
+x <- stock_df$sentiment_score
+h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", 
+   main="Histogram with Normal Curve") 
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+```
+
+
+```{r}
+library(corrplot)
+M <- cor(stock_df[,4:8])
+corrplot(M, method="circle")
+```
+
+```{r}
+stock_df <- stock_df%>%mutate(stock_val = (High+Low)/2)
+```
+
+
+
+
+
+
+
+
+
+```{r}
+library(keras)
+stock_df <- stock_df%>%select(Date,company_name,company_name_full,Volume,sentiment_score,sentiment_common,target)
+stock_df
+```
+
+```{r}
+library(corrplot)
+M <- cor(stock_df[,4:7])
+corrplot(M, method="circle")
+```
+
+
+
+
+
+```{r}
+sample_size = floor(0.8*nrow(stock_df))
+set.seed(777)
+
+# randomly split data in r
+picked = sample(seq_len(nrow(stock_df)),size = sample_size)
+train_stock_df =stock_df[picked,]
+test_stock_df =stock_df[-picked,]
+
+train_stock <- train_stock_df%>%select(Volume,sentiment_score,sentiment_common)
+test_stock <- test_stock_df%>%select(Volume,sentiment_score,sentiment_common)
+train_target <- train_stock_df%>%select(target)
+test_target <- test_stock_df%>%select(target)
+
+```
+
+
+
+```{r}
+train_data <- scale(train_stock) 
+col_means_train <- attr(train_data, "scaled:center") 
+col_stddevs_train <- attr(train_data, "scaled:scale")
+test_data <- scale(test_stock, center = col_means_train, scale = col_stddevs_train)
+```
+
+```{r}
+build_model <- function() {
+  
+  model <- keras_model_sequential() %>%
+    layer_dense(units = 64, activation = "relu",
+                input_shape = dim(train_data)[2]) %>%
+    layer_dense(units = 64, activation = "relu") %>%
+    layer_dense(units = 1)
+  
+  model %>% compile(
+    loss = "mse",
+    optimizer = optimizer_rmsprop(),
+    metrics = list("mean_absolute_error")
+  )
+  
+  model
+}
+
+model <- build_model()
+model %>% summary()
+
+```
+
+
+```{r}
+train_target <- data.matrix(train_target)
+print_dot_callback <- callback_lambda(
+  on_epoch_end = function(epoch, logs) {
+    if (epoch %% 80 == 0) cat("\n")
+    cat(".")
+  }
+)    
+
+epochs <- 1000
+
+# Fit the model and store training stats
+history <- model %>% fit(
+  train_data,
+  train_target,
+  epochs = epochs,
+  validation_split = 0.2,
+  verbose = 0,
+  callbacks = list(print_dot_callback)
+)
+
+```
+
+
+
+
+```{r}
+library(ggplot2)
+
+plot(history, metrics = "mean_absolute_error", smooth = FALSE) +
+  coord_cartesian(ylim = c(0, 5))
+```
+
+
+```{r}
+test_target <- data.matrix(test_target)
+c(loss, mae) %<-% (model %>% evaluate(test_data, test_target, verbose = 0))
+
+paste0("Mean absolute error on test set: $", sprintf("%.2f", mae ))
+```
+
+```{r}
+test_predictions <- model %>% predict(test_data)
+a <- as.data.frame(x = test_predictions[ , 1])
+results <- a%>%mutate(actual = test_target)%>%mutate(prediction = test_predictions[ , 1]) %>% mutate(accuracy= 100 -((abs((actual-prediction)/actual))*100))%>% select(actual,prediction,accuracy)
+results <- results%>%filter(actual!=0)
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+results%>%filter(accuracy<90)
+```
+
+```{r}
+summary(results$accuracy)
+```

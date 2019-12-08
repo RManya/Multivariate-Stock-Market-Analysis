@@ -1,0 +1,236 @@
+---
+title: "R Notebook"
+output: pdf_output
+---
+
+```{r}
+library(keras)
+library(dplyr)
+```
+
+```{r loading_data}
+stock_df <- read.csv("Final_data_with_reddit.csv")
+stock_df <- stock_df[,3:11]
+head(stock_df)
+```
+
+
+```{r}
+x <- stock_df$sentiment_score
+h<-hist(x, breaks=2, col="red", xlab="Sentiment", 
+   main="Histogram with Normal Curve") 
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+```
+
+
+```{r}
+library(corrplot)
+M <- cor(stock_df[,4:8])
+corrplot(M, method="circle")
+```
+
+```{r}
+stock_df <- stock_df%>%mutate(stock_val = (High+Low)/2)
+```
+
+
+
+
+```{r}
+library(keras)
+stock_df <- stock_df%>%select(Date,company_name,company_name_full,stock_val,Volume,sentiment_score,sentiment_common,target)
+stock_df
+```
+
+```{r}
+stock_df$Date <- as.Date(stock_df$Date)
+```
+
+
+
+```{r}
+library(corrplot)
+M <- cor(stock_df[,4:8])
+corrplot(M, method="circle")
+```
+
+
+
+
+
+```{r}
+sample_size = floor(0.8*nrow(stock_df))
+set.seed(777)
+train_stock_df = stock_df%>%filter(Date<'2014-01-01')
+test_stock_df = stock_df%>%filter(Date>='2014-01-01')
+```
+
+
+```{r}
+train_stock <- train_stock_df%>%select(stock_val,Volume,sentiment_score,sentiment_common)
+test_stock <- test_stock_df%>%select(stock_val,Volume,sentiment_score,sentiment_common)
+train_target <- train_stock_df%>%select(target)
+test_target <- test_stock_df%>%select(target)
+```
+
+
+```{r}
+train_data <- scale(train_stock) 
+col_means_train <- attr(train_data, "scaled:center") 
+col_stddevs_train <- attr(train_data, "scaled:scale")
+test_data <- scale(test_stock, center = col_means_train, scale = col_stddevs_train)
+```
+
+
+```{r}
+train_X <- as.matrix(train_data)
+train_y <- as.matrix(train_target)
+test_X <- as.matrix(test_data)
+test_y <- as.matrix(test_target)
+
+
+dim(train_X) <- c(dim(train_X)[1],1,dim(train_X)[2])
+dim(test_X) <- c(dim(test_X)[1],1,dim(test_X)[2])
+```
+
+```{r}
+library("keras")
+
+rmsprop = optimizer_rmsprop(lr=0.00001, rho=0.9, epsilon=1e-08)
+model <- keras_model_sequential()
+
+model %>%
+    layer_lstm(units            = 100, 
+               input_shape      = c(dim(train_X)[2],dim(train_X)[3] ), 
+               return_sequences = TRUE, 
+               ) %>% 
+    layer_dropout(0.5)%>%
+    layer_lstm(units            = 75, 
+               return_sequences = FALSE, 
+               ) %>% 
+  layer_dropout(0.5)%>%
+  layer_flatten()%>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dropout(0.5)%>%
+  layer_dense(units = 1)
+
+model %>% 
+    compile(loss = 'mae', optimizer = rmsprop)
+
+model
+```
+
+```{r}
+
+epochs = 50
+
+
+history <- model %>% fit(
+  train_X,
+  train_y,
+  epochs = epochs,
+  batch_size = 10,
+  validation_split = 0.2,
+  verbose = 1,
+  shuffle = FALSE
+)
+
+
+```
+
+```{r}
+model %>% save_model_hdf5("model_lstm")
+
+```
+
+```{r}
+plot(history, metrics = "mean_absolute_error", smooth = FALSE) +
+  coord_cartesian(ylim = c(0, 5))
+
+```
+
+```{r}
+pred_out <- model %>% 
+    predict(test_X, batch_size = 10) %>%
+    .[,1] 
+
+length(pred_out)
+```
+```{r}
+plot(pred_out, metrics = "mean_absolute_error", smooth = FALSE) +
+  coord_cartesian(ylim = c(0, 5))
+
+model
+```
+
+```{r}
+#predicted <- as.list(pred_out)
+actual <- as.list(test_y)
+a <- as.data.frame(test_y)
+tbl_1 <- a %>%
+    mutate(predicted = pred_out)
+results <- tbl_1%>% mutate(accuracy=100 - abs(((target-predicted)/target)*100))%>% select(target,predicted,accuracy)
+results <- results%>%filter(actual!=0)
+```
+
+```{r}
+summary(results$accuracy)
+```
+
+
+```{r}
+output_df <- test_stock_df%>%mutate(predicted = pred_out)
+```
+
+```{r}
+IBM <- output_df%>%filter(company_name=='IBM')
+Apple <- output_df%>%filter(company_name=='AAPL')
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(hrbrthemes)
+output_df$Date <- as.Date(output_df$Date)
+
+# Usual area chart
+p <- Apple %>%
+  ggplot() + 
+  geom_line(aes(x = Date, y = target,group = ), color = "red",alpha = 0.5)+
+  geom_line(aes(x = Date, y = predicted), color = "black") +
+  xlab('Dates') +
+  ylab('Stock Price')
+p
+
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(hrbrthemes)
+output_df$Date <- as.Date(output_df$Date)
+
+png(filename="stock_plot_IBM.png", width=2500, height=500)
+# Usual area chart
+p <- IBM %>%
+  ggplot() + 
+  geom_line(aes(x = Date, y = target,group = ), color = "red",alpha = 0.5)+
+  geom_line(aes(x = Date, y = predicted), color = "black") +
+  xlab('Dates') +
+  ylab('Stock Price')
+p
+
+ggsave(file="stock_plot_IBM.png", width=25, height=10, dpi=300)
+```
+
+```{r}
+q <- ggplotly(p)
+q
+
+```
