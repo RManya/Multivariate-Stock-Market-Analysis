@@ -1,0 +1,189 @@
+---
+title: "Project-visualization"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(readxl)
+library(plotly)
+library(tidyverse)
+library(ggrepel)
+library(gganimate)
+library(tseries)
+library(forecast)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+df <- read_csv("/Users/manyaraman/Desktop/Final_data_with_reddit.csv")
+df<-df[,-c(1,2)]
+factor(df$company_name)
+final_df <- df%>%mutate(stock_val = (High+Low)/2)
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, warning = false,echo=FALSE}
+
+stock_plot <- ggplot(
+  final_df,
+  aes(Date, stock_val, group = company_name, color = factor(company_name))
+  ) +
+  geom_line(size=0.3) +
+  scale_color_viridis_d() +
+  labs(x = "Date", y = "Stock Value") +
+  theme(legend.position = "top")+
+  theme_minimal(base_size = 8)+ theme(axis.text.x = element_text(angle = 90)) 
+  
+
+ggplotly(stock_plot + scale_color_discrete(name="Company") ) 
+
+##stock_plot + geom_point() + transition_reveal(Date)
+
+```
+
+
+
+```{r}
+library(forecast)
+
+final<- final_df%>%filter(company_name == 'WBA' & Date>='2009-01-01' & Date <'2009-03-01')
+
+# normalize <- function(x) {
+# num <- x - min(x) 
+# denom <- diff(range(x)) 
+# return (num/denom)
+# }
+
+#final$stock_val<- normalize(final$stock_val)
+#final$sentiment_common<-normalize(final$sentiment_common)
+
+final_f<- final[-1,]
+final_f$stock_val<- diff(final$stock_val)
+final_f$stock_lag<- lag(final_f$stock_val,n=1)
+
+p <- ggplot() + 
+  geom_line(data = final_f, aes(x = Date, y = stock_lag), color =" blue") +
+  geom_line(data = final_f, aes(x = Date, y = sentiment_common), color = "red") +
+  scale_color_viridis_d() +
+  labs(x = "Date", y = "Stock",title = "Walgreens") +
+  theme(legend.position = "top")+
+  theme_minimal(base_size = 8)+ theme(axis.text.x = element_text(angle = 90)) 
+
+ggplotly(p)
+
+```
+```{r}
+
+
+final<- final_df%>%filter(company_name == 'IBM' | company_name == 'Walgreens' |company_name == 'AAPL' & Date>='2008-01-01' & Date <'2016-03-01')
+
+final_f<- final[-1,]
+final_f$stock_val<- diff(final$stock_val)
+final_f$stock_lag<- lag(final_f$stock_val,n=1)
+
+
+
+p <- ggplot() + 
+  geom_line(data = final_f, aes(x = Date, y = stock_lag), color =" blue") +
+  geom_line(data = final_f, aes(x = Date, y = sentiment_common), color = "red") +
+  scale_color_viridis_d() +
+  labs(x = "Date", y = "Stock") +
+  theme(legend.position = "top")+
+  theme_minimal(base_size = 8)+ theme(axis.text.x = element_text(angle = 90)) 
+
+ggplotly(p)
+
+
+```
+
+
+
+
+
+
+```{r Sliding bar plot }
+
+plotdata <- final_df %>%
+  group_by(Date) %>%
+  mutate(ordering = rank(stock_val)) %>%
+  ungroup() 
+
+
+p<-ggplot(plotdata,
+       aes(ordering, group = company_name, color=factor(company_name),fill=factor(company_name), show.legend = FALSE)) +
+  geom_tile(aes(y = stock_val/2, 
+                height = stock_val,
+                width = 0.9), alpha = 0.4) +
+  # text on top of bars
+  geom_text(aes(y = stock_val, label = as.integer(stock_val)), hjust = -0.2) +
+ # geom_text(aes(y = 0, label = country, hjust = 3)) +
+  # text in x-axis (requires clip = "off" in coord_cartesian)
+  geom_text(aes(y = 0, label = company_name, color="black"), hjust = 0, show.legend = FALSE) +
+  coord_flip(clip = "off", expand = TRUE) +
+  enter_fade() + 
+   exit_shrink() +
+  coord_flip()+
+  scale_color_viridis_d(name="", guide=FALSE)+
+  scale_fill_viridis_d(name="",guide=FALSE)+
+  ylim(0, 200) +
+#  theme_tufte(14,"Avenir")+
+  theme_classic() +
+ # guides(color=F,fill=F)+
+  labs(title = "Year: {closest_state}", y="Stock", x="Company" ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 24),
+        axis.ticks.y = element_blank(),
+        axis.text.y  = element_blank()) + 
+  transition_states(states = Date, transition_length = 2, state_length = 1) + 
+#  transition_time(year)+
+  ease_aes('cubic-in-out')
+
+animate(p, nframes = 160, fps = 20, end_pause = 20, width = 500, height = 900) 
+#use anim_save(filename) to save
+
+anim_save("animation_le4.gif", animation = last_animation())
+
+```
+
+
+
+```{r}
+fc<-final_df %>% filter(Date == '2008-08-08' | Date =='2016-03-01')%>%dplyr::select(Date,stock_val,company_name)
+fcs<-spread(fc, key = Date, value = stock_val)
+
+
+left_label <- paste(fcs$company_name, round(fcs$`2008-08-08`),sep=", ")
+right_label <- paste(fcs$company_name, round(fcs$`2016-03-01`),sep=", ")
+
+p <- ggplot(fcs) + geom_segment(aes(x=1, xend=2, y=`2008-08-08`, yend=`2016-03-01`, color=factor(company_name)), size=.5, show.legend=F) + 
+                  geom_vline(xintercept=1, linetype="dashed", size=.1) + 
+                  geom_vline(xintercept=2, linetype="dashed", size=.1) +
+                  labs(x="", y="Stock Value") +  # Axis labels
+                  xlim(.5, 2.5) + ylim(0,(1.1*(max(fcs$`2008-08-08`, fcs$`2016-03-01`)))) 
+
+p <- p + geom_text_repel(label=left_label, y=fcs$`2008-08-08`, x=rep(1, NROW(fcs)), hjust=0.1, size=2)
+p <- p + geom_text_repel(label=right_label, y=fcs$`2016-03-01`, x=rep(2, NROW(fcs)), hjust=0.1, size=2)
+p <- p + geom_text(label="Time 1 : 2008", x=1, y=1.1*(max(fcs$`2008-08-08`, fcs$`2016-03-01`)), hjust=1.2, size=5)  # title
+p <- p + geom_text(label="Time 2 : 2016", x=2, y=1.1*(max(fcs$`2008-08-08`, fcs$`2016-03-01`)), hjust=-0.1, size=5)  # title
+
+# Minify theme
+p + theme(panel.background = element_blank(), 
+           panel.grid = element_blank(),
+           axis.ticks = element_blank(),
+           axis.text.x = element_blank(),
+           panel.border = element_blank())
+
+```
