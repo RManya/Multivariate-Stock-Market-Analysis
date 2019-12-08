@@ -6,4 +6,4 @@ The stock market prediction has been an active area of research for quite a whil
 In this project, our goal is to analyse how much of a role do these factors play while attempting to predict the next day's stock price.Thus, making a model with checking all possible computations and permutations that improves it's accuracy and delivers an efficient model.
 
 
-Find the link to the full project report [here](https://github.com/akmenon1996/Multivariate-Stock-Market-Analysis/blob/master/Multivariate_Analysis_of_Stock_Prices.pdf)
+Find the link to the full project report [here](https://github.com/akmenon1996/Multivariate-Stock-Market-Analysis/blob/master/Multivariate_Analysis_of_Stock_Prices.pdf).
