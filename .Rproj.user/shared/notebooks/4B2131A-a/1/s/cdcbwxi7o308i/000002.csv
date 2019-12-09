@@ -1,4 +1,0 @@
-"0","training_data_c <- Toyota_data_class[Split_dataset==1,] "
-"0","validation_data_c <- Toyota_data_class[Split_dataset==2,]"
-"0","test_data_c <- Toyota_data_class[Split_dataset==3,]"
-"0","training_data_c"

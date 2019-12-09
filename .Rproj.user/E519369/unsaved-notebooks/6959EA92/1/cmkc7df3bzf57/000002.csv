@@ -1,8 +1,0 @@
-"0","# transforming data with tf-idf"
-"0","dtm_tweets_tfidf <- fit_transform(dtm_tweets, tfidf)"
-"0",""
-"0","# predict probabilities of positiveness"
-"0","preds_tweets <- predict(glmnet_classifier, dtm_tweets_tfidf, type = 'response')[ ,1]"
-"0",""
-"0","# adding rates to initial dataset"
-"0","df_tweets$sentiment <- preds_tweets"

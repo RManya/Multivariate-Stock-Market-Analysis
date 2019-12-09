@@ -1,2 +1,0 @@
-"0","Toyota_data_new$bin_price = as.factor(as.numeric(cut(Toyota_data_new$Price,20)))"
-"0","Toyota_data_class <- Toyota_data_new[,-2]"

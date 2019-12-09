@@ -1,4 +1,0 @@
-"0","Toyota_data_new = cbind(Toyota_data,dummy(Toyota_data$Fuel_Type, sep = ""_""))"
-"0","Toyota_data_new$CNG <- Toyota_data_new$Toyota_data_CNG"
-"0","Toyota_data_new$Petrol <- Toyota_data_new$Toyota_data_Petrol"
-"0","Toyota_data_new$Diesel <- Toyota_data_new$Toyota_data_Diesel"
